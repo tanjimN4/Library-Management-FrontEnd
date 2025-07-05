@@ -1,4 +1,4 @@
-import type { IBook } from '@/types';
+import type { IBook, IBorrowSummary } from '@/types';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 interface BooksResponse {
@@ -17,7 +17,7 @@ interface BooksResponse {
 export const baseApi = createApi({
     reducerPath: 'baseApi',
     tagTypes: ['book', 'borrowBook'],
-    baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api" }),
+    baseQuery: fetchBaseQuery({ baseUrl: "https://library-management-system-backend-sable.vercel.app/api" }),
     endpoints: (builder) => ({
         getBooks: builder.query<BooksResponse, { page?: number; limit?: number }>({
             query: ({ page = 1, limit = 10 } = {}) => `/books?page=${page}&limit=${limit}`,
@@ -57,9 +57,9 @@ export const baseApi = createApi({
             }),
             invalidatesTags: ['borrowBook', 'book']
         }),
-        getBorrowBook: builder.query({
+        getBorrowBook: builder.query<IBorrowSummary[], void>({
             query: () => '/borrow',
-            transformResponse: (res: { success: boolean; message: string; data: IBook[] }) => res.data,
+            transformResponse: (res: { success: boolean; message: string; data: IBorrowSummary[] }) => res.data,
             providesTags: ['borrowBook']
         })
     })

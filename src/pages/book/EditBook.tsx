@@ -21,12 +21,11 @@ import { useUpdateBookMutation } from "@/redux/api/baseApi";
 import type { IBook } from "@/types";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-interface EditBookProps {
-  book: IBook & { _id: string };
+interface IProps {
+  book:IBook
 }
 
-const EditBook = ({ book }: EditBookProps) => {
+const EditBook = ({ book }: IProps) => {
   const [open, setOpen] = useState(false);
   const [updateBook] = useUpdateBookMutation();
   const [imagePreview, setImagePreview] = useState<string>(book.image);

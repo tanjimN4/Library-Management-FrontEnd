@@ -25,10 +25,10 @@ import Swal from "sweetalert2";
 import { format } from "date-fns"; 
 
 interface BorrowData {
-    title: string;
-    isbn: string;
+    title?: string;
+    isbn?: string;
     quantity: number;
-    dueDate: string;
+    dueDate?: string;
     book?: string;
 }
 
