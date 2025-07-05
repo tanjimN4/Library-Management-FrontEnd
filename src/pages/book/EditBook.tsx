@@ -23,11 +23,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface EditBookProps {
-  book: IBook;
+  book: IBook & { _id: string };
 }
 
 const EditBook = ({ book }: EditBookProps) => {
-  const [open,setOpen]=useState(false)
+  const [open, setOpen] = useState(false);
+  const [updateBook] = useUpdateBookMutation();
+  const [imagePreview, setImagePreview] = useState<string>(book.image);
+  const [newImageFile, setNewImageFile] = useState<File | null>(null);
+
   const form = useForm<IBook>({
     defaultValues: {
       title: book.title,
@@ -37,28 +41,47 @@ const EditBook = ({ book }: EditBookProps) => {
       description: book.description,
       copies: book.copies,
       available: book.available,
-      _id: book._id,
+      image: book.image,
     },
   });
 
-  const [updateBook]=useUpdateBookMutation()
+  const uploadImageToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
 
-  const onSubmit = (data: IBook) => {
-    updateBook({
-        id:data._id,
-        body:data
-    })
-    setOpen(false)
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    return data.secure_url;
+  };
+
+  const onSubmit = async (data: IBook) => {
+    let imageUrl = book.image;
+
+    if (newImageFile) {
+      imageUrl = await uploadImageToCloudinary(newImageFile);
+    }
+
+    const updatedBook: IBook = {
+      ...data,
+      available: data.copies > 0,
+      image: imageUrl,
+    };
+
+    updateBook({ id: book._id, body: updatedBook });
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-cyan-500 hover:bg-cyan-600" >
-          ✏️ Edit
-        </Button>
+        <Button className="bg-cyan-500 hover:bg-cyan-600">✏️ Edit</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px] h-[500px] overflow-y-auto p-4">
         <DialogHeader>
           <DialogTitle>Edit Book</DialogTitle>
           <DialogDescription>Edit and save your book details.</DialogDescription>
@@ -107,19 +130,6 @@ const EditBook = ({ book }: EditBookProps) => {
             />
             <FormField
               control={form.control}
-              name="isbn"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ISBN</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -134,32 +144,56 @@ const EditBook = ({ book }: EditBookProps) => {
             <FormField
               control={form.control}
               name="copies"
-              render={({ field }) => (
+              rules={{
+                validate: (value) =>
+                  value !== null && value >= 0 ? true : "Copies must be 0 or greater",
+              }}
+              render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>Copies</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <Input
+                      type="number"
+                      {...field}
+                      min={0}
+                      step={1}
+                    />
                   </FormControl>
-                  <FormMessage />
+                  {fieldState.error && (
+                    <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+                  )}
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="available"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Available</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setNewImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </FormControl>
+              {imagePreview && (
+                <img
+                  src={imagePreview}
+                  alt="Book Preview"
+                  className="mt-2 h-32 rounded object-cover"
+                />
               )}
-            />
-            <input type="hidden" value={String(book._id)} />
+            </FormItem>
+
             <DialogFooter>
-              <Button className="bg-emerald-700 hover:bg-emerald-500" type="submit">Save changes</Button>
+              <Button className="bg-emerald-700 hover:bg-emerald-500" type="submit">
+                💾 Save changes
+              </Button>
             </DialogFooter>
           </form>
         </Form>

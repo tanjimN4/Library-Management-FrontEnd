@@ -1,69 +1,74 @@
-# React + TypeScript + Vite
+# 📚 Library Management System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **frontend** for the Minimal Library Management System built with **React**, **TypeScript**, **Redux Toolkit Query**, and **Tailwind CSS**. It allows users to view, add, update, delete, and borrow books, as well as see a borrow summary—all without authentication.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🎯 Features
 
-## Expanding the ESLint configuration
+✅ View all books in a responsive card grid  
+✅ Add a new book  
+✅ Edit or delete a book  
+✅ Borrow a book (with quantity and due date)  
+✅ Borrow summary showing total quantity borrowed per book  
+✅ Pagination, sorting, and filtering support  
+✅ Toast notifications and form validation  
+✅ Responsive UI using Tailwind and ShadCN  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## ⚙️ Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+| Layer        | Tech                          |
+|--------------|-------------------------------|
+| Framework    | React, TypeScript             |
+| State Mgmt   | Redux Toolkit + RTK Query     |
+| Styling      | Tailwind CSS + ShadCN UI      |
+| Forms        | React Hook Form + Zod         |
+| Routing      | React Router DOM              |
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clonehttps://github.com/tanjimN4/Library-Management-FrontEnd
+cd frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+API Endpoints Used
+GET /books – fetch books (with pagination/filter)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+POST /books – add book
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+PUT /books/:id – update book
+
+DELETE /books/:id – delete book
+
+POST /borrow – borrow a book
+
+GET /borrow – view borrow summary
+
+frontend/
+├── components/        # Reusable UI components
+├── pages/             # Page components for routes
+├── redux/
+│   ├── api/           # RTK Query endpoints
+│   └── slices/        # Optional Redux slices
+├── types/             # TypeScript interfaces
+├── App.tsx
+├── main.tsx
+├── .env.local
+└── README.md
+
+
+UI Highlights
+📱 Responsive on mobile, tablet, and desktop
+
+🧠 Typed forms with Zod + React Hook Form
+
+🔔 Toast notifications with ShadCN
+
+💨 Fast API updates via RTK Query (includes invalidation)
